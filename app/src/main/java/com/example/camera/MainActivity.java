@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +15,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Random;
 
 import javax.xml.transform.Result;
 
@@ -49,6 +54,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void SaveImage(Bitmap finalBitmap) {
+
+        String root = Environment.getExternalStorageDirectory().toString();
+        File myDir = new File(root + "/saved_images");
+        if (!myDir.exists()) {
+            myDir.mkdirs();
+        }
+        Random generator = new Random();
+        int n = 10000;
+        n = generator.nextInt(n);
+        String fname = "Image-"+ n +".jpg";
+        File file = new File (myDir, fname);
+        if (file.exists ())
+            file.delete ();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap =(Bitmap) extras.get("data");
                 imageview.setImageBitmap(imageBitmap);
+                SaveImage(imageBitmap);
         }
     }
 }
